@@ -1,0 +1,73 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-start mb-3">
+  <div>
+    <h3 class="mb-1">Incident #{{ incident.id }}</h3>
+    <div class="text-secondary">{{ incident.title }}</div>
+  </div>
+  <div class="d-flex gap-2">
+    <a class="btn btn-outline-dark" href="{{ url_for('incident_edit', incident_id=incident.id) }}">Edit</a>
+    <a class="btn btn-outline-secondary" href="{{ url_for('dashboard') }}">Back</a>
+  </div>
+</div>
+
+<div class="row g-3">
+  <div class="col-lg-8">
+    <div class="card border-0 shadow-sm mb-3">
+      <div class="card-body">
+        <h5>Description</h5>
+        <div class="text-secondary" style="white-space:pre-wrap;">{{ incident.description }}</div>
+      </div>
+    </div>
+
+    <div class="card border-0 shadow-sm">
+      <div class="card-body">
+        <h5 class="mb-3">Attachments</h5>
+
+        <form method="post" action="{{ url_for('incident_upload', incident_id=incident.id) }}" enctype="multipart/form-data" class="d-flex gap-2 mb-3">
+          <input class="form-control" type="file" name="file" required>
+          <button class="btn btn-dark">Upload</button>
+        </form>
+
+        <ul class="list-group">
+          {% for a in incident.attachments %}
+            <li class="list-group-item d-flex justify-content-between align-items-center">
+              <div>
+                <div class="fw-semibold">{{ a.original_name }}</div>
+                <div class="small text-secondary">{{ a.created_at.strftime("%Y-%m-%d %H:%M UTC") }}</div>
+              </div>
+              <a class="btn btn-sm btn-outline-primary" href="{{ url_for('attachment_download', attachment_id=a.id) }}">Download</a>
+            </li>
+          {% else %}
+            <li class="list-group-item text-secondary">No attachments yet.</li>
+          {% endfor %}
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-lg-4">
+    <div class="card border-0 shadow-sm">
+      <div class="card-body">
+        <h5 class="mb-3">Details</h5>
+        <div class="mb-2"><span class="text-secondary">Severity:</span> <span class="fw-semibold">{{ incident.severity }}</span></div>
+        <div class="mb-2"><span class="text-secondary">Status:</span> <span class="fw-semibold">{{ incident.status }}</span></div>
+        <div class="mb-2"><span class="text-secondary">Category:</span> <span class="fw-semibold">{{ incident.category }}</span></div>
+        <div class="mb-2"><span class="text-secondary">Asset:</span> <span class="fw-semibold">{{ incident.affected_asset or "N/A" }}</span></div>
+
+        <hr>
+
+        <div class="mb-2"><span class="text-secondary">Reporter:</span> <span class="fw-semibold">{{ incident.reporter.full_name }}</span></div>
+        <div class="mb-2"><span class="text-secondary">Assignee:</span>
+          <span class="fw-semibold">{{ incident.assignee.full_name if incident.assignee else "Unassigned" }}</span>
+        </div>
+
+        <hr>
+
+        <div class="small text-secondary">Created: {{ incident.created_at.strftime("%Y-%m-%d %H:%M UTC") }}</div>
+        <div class="small text-secondary">Updated: {{ incident.updated_at.strftime("%Y-%m-%d %H:%M UTC") }}</div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

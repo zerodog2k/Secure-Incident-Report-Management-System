@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="row justify-content-center">
+  <div class="col-md-5 col-lg-4">
+    <div class="card shadow-sm border-0">
+      <div class="card-body p-4">
+        <h4 class="mb-2">Sign in</h4>
+        <p class="text-secondary mb-4">Secure access to incident reporting.</p>
+
+        <form method="post" action="{{ url_for('login_post') }}">
+          <div class="mb-3">
+            <label class="form-label">Email</label>
+            <input name="email" type="email" class="form-control" required />
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Password</label>
+            <input name="password" type="password" class="form-control" required />
+          </div>
+          <button class="btn btn-dark w-100">Login</button>
+        </form>
+
+        <hr class="my-4">
+        <div class="small text-secondary">
+          Default admin (after initdb): admin@example.com / Admin@12345
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

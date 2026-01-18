@@ -1,0 +1,86 @@
+{% extends "base.html" %}
+{% block content %}
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+  <div>
+    <h3 class="mb-0">Incidents</h3>
+    <div class="text-secondary small">Track, assign, and close security incidents.</div>
+  </div>
+  <a class="btn btn-primary" href="{{ url_for('incident_new') }}">New Incident</a>
+</div>
+
+<form class="card border-0 shadow-sm mb-3" method="get">
+  <div class="card-body">
+    <div class="row g-2">
+      <div class="col-md-6">
+        <input class="form-control" name="q" placeholder="Search title, asset, category, description" value="{{ q or '' }}">
+      </div>
+      <div class="col-md-3">
+        <select class="form-select" name="status">
+          <option value="">All status</option>
+          {% for s in ["Open","In Progress","Resolved","Closed"] %}
+            <option value="{{ s }}" {% if status==s %}selected{% endif %}>{{ s }}</option>
+          {% endfor %}
+        </select>
+      </div>
+      <div class="col-md-3">
+        <select class="form-select" name="severity">
+          <option value="">All severity</option>
+          {% for s in ["Low","Medium","High","Critical"] %}
+            <option value="{{ s }}" {% if severity==s %}selected{% endif %}>{{ s }}</option>
+          {% endfor %}
+        </select>
+      </div>
+      <div class="col-12 d-flex gap-2">
+        <button class="btn btn-dark">Filter</button>
+        <a class="btn btn-outline-secondary" href="{{ url_for('dashboard') }}">Reset</a>
+      </div>
+    </div>
+  </div>
+</form>
+
+<div class="card border-0 shadow-sm">
+  <div class="table-responsive">
+    <table class="table table-hover mb-0 align-middle">
+      <thead class="table-light">
+        <tr>
+          <th style="width:90px;">ID</th>
+          <th>Title</th>
+          <th style="width:140px;">Severity</th>
+          <th style="width:160px;">Status</th>
+          <th style="width:180px;">Updated</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for i in incidents %}
+          <tr onclick="window.location='{{ url_for('incident_view', incident_id=i.id) }}'" style="cursor:pointer;">
+            <td class="fw-semibold">#{{ i.id }}</td>
+            <td>
+              <div class="fw-semibold">{{ i.title }}</div>
+              <div class="small text-secondary">{{ i.category }}{% if i.affected_asset %} • {{ i.affected_asset }}{% endif %}</div>
+            </td>
+            <td>{{ i.severity }}</td>
+            <td>{{ i.status }}</td>
+            <td class="text-secondary small">{{ i.updated_at.strftime("%Y-%m-%d %H:%M UTC") }}</td>
+          </tr>
+        {% else %}
+          <tr><td colspan="5" class="text-center py-4 text-secondary">No incidents found.</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+
+{% if pagination.pages > 1 %}
+<nav class="mt-3">
+  <ul class="pagination">
+    {% for p in range(1, pagination.pages + 1) %}
+      <li class="page-item {% if p == pagination.page %}active{% endif %}">
+        <a class="page-link" href="{{ url_for('dashboard') }}?{{ urlencode({'page': p, 'q': q, 'status': status, 'severity': severity}) }}">{{ p }}</a>
+      </li>
+    {% endfor %}
+  </ul>
+</nav>
+{% endif %}
+
+{% endblock %}

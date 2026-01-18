@@ -1,0 +1,15 @@
+incident-system/
+  app.py
+  requirements.txt
+  .env.example
+  /templates
+    base.html
+    login.html
+    dashboard.html
+    incident_new.html
+    incident_view.html
+    incident_edit.html
+    users.html
+    user_new.html
+    audit.html
+  /uploads
