@@ -1,0 +1,58 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="row justify-content-center">
+  <div class="col-12 col-md-8 col-lg-5">
+    <div class="card shadow-sm border-0">
+      <div class="card-body p-4 p-md-5">
+        <h2 class="fw-bold mb-1">Sign in</h2>
+        <p class="text-secondary mb-4">Secure access to incident reporting.</p>
+
+        <form method="post" action="{{ url_for('login_post') }}" class="needs-validation" novalidate>
+          <div class="mb-3">
+            <label class="form-label fw-semibold">Email</label>
+            <input type="email" name="email" class="form-control" placeholder="name@example.com" required>
+            <div class="invalid-feedback">Please enter your email.</div>
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label fw-semibold">Password</label>
+            <input type="password" name="password" class="form-control" placeholder="Your password" required>
+            <div class="invalid-feedback">Please enter your password.</div>
+          </div>
+
+          <button type="submit" class="btn btn-dark w-100 py-2 fw-semibold">
+            Login
+          </button>
+        </form>
+
+        <hr class="my-4">
+
+        <div class="text-center">
+          <span class="text-secondary">New user?</span>
+          <a class="fw-semibold text-decoration-none" href="{{ url_for('register') }}">Create an account</a>
+        </div>
+
+        <div class="text-center text-secondary small mt-3">
+          Default admin (after initdb): admin@example.com / Admin@12345
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  (() => {
+    const forms = document.querySelectorAll('.needs-validation');
+    Array.from(forms).forEach(form => {
+      form.addEventListener('submit', event => {
+        if (!form.checkValidity()) {
+          event.preventDefault();
+          event.stopPropagation();
+        }
+        form.classList.add('was-validated');
+      }, false);
+    });
+  })();
+</script>
+{% endblock %}

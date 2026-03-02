@@ -1,0 +1,166 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<div class="d-flex align-items-start justify-content-between mb-3">
+  <div>
+    <h1 class="h3 fw-bold mb-1">Incidents</h1>
+    <div class="text-secondary">Track, assign, and close security incidents.</div>
+  </div>
+
+  <a class="btn btn-primary btn-lg" href="{{ url_for('incident_new') }}">
+    New Incident
+  </a>
+</div>
+
+<!-- Filters -->
+<div class="card shadow-sm border-0 mb-4">
+  <div class="card-body">
+    <form method="get" action="{{ url_for('dashboard') }}" class="row g-3 align-items-end">
+      <div class="col-12 col-lg-6">
+        <label class="form-label fw-semibold">Search</label>
+        <input class="form-control"
+               name="q"
+               value="{{ q }}"
+               placeholder="Search title, asset, category, description">
+      </div>
+
+      <div class="col-6 col-lg-3">
+        <label class="form-label fw-semibold">Status</label>
+        <select class="form-select" name="status">
+          <option value="">All status</option>
+          {% for s in ["Open","In Progress","Resolved","Closed"] %}
+            <option value="{{ s }}" {% if status == s %}selected{% endif %}>{{ s }}</option>
+          {% endfor %}
+        </select>
+      </div>
+
+      <div class="col-6 col-lg-3">
+        <label class="form-label fw-semibold">Severity</label>
+        <select class="form-select" name="severity">
+          <option value="">All severity</option>
+          {% for sev in ["Low","Medium","High","Critical"] %}
+            <option value="{{ sev }}" {% if severity == sev %}selected{% endif %}>{{ sev }}</option>
+          {% endfor %}
+        </select>
+      </div>
+
+      <div class="col-12 d-flex gap-2">
+        <button class="btn btn-dark" type="submit">Filter</button>
+        <a class="btn btn-outline-secondary" href="{{ url_for('dashboard') }}">Reset</a>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Table -->
+<div class="card shadow-sm border-0">
+  <div class="card-body p-0">
+    <div class="table-responsive">
+      <table class="table table-hover align-middle mb-0">
+        <thead class="table-light">
+          <tr>
+            <th class="ps-4" style="width:120px;">ID</th>
+            <th>Title</th>
+            <th style="width:140px;">Severity</th>
+            <th style="width:140px;">Status</th>
+            <th style="width:220px;">Updated</th>
+          </tr>
+        </thead>
+
+        <tbody>
+        {% for inc in incidents %}
+          <tr style="cursor:pointer;"
+              onclick="window.location='{{ url_for('incident_view', incident_id=inc.id) }}'">
+
+            <td class="ps-4 fw-semibold">
+              <a class="text-decoration-none"
+                 href="{{ url_for('incident_view', incident_id=inc.id) }}"
+                 onclick="event.stopPropagation();">
+                #{{ inc.id }}
+              </a>
+            </td>
+
+            <td>
+              <div class="fw-semibold">
+                <a class="text-decoration-none"
+                   href="{{ url_for('incident_view', incident_id=inc.id) }}"
+                   onclick="event.stopPropagation();">
+                  {{ inc.title }}
+                </a>
+              </div>
+              <div class="text-secondary small">
+                {{ inc.category }}
+                {% if inc.affected_asset %} • {{ inc.affected_asset }}{% endif %}
+              </div>
+            </td>
+
+            <td>
+              {% set sev = inc.severity %}
+              {% set sev_class = "secondary" %}
+              {% if sev == "Low" %}{% set sev_class = "success" %}{% endif %}
+              {% if sev == "Medium" %}{% set sev_class = "secondary" %}{% endif %}
+              {% if sev == "High" %}{% set sev_class = "warning" %}{% endif %}
+              {% if sev == "Critical" %}{% set sev_class = "danger" %}{% endif %}
+              <span class="badge text-bg-{{ sev_class }} px-3 py-2">
+                {{ sev }}
+              </span>
+            </td>
+
+            <td>
+              {% set st = inc.status %}
+              {% set st_class = "secondary" %}
+              {% if st == "Open" %}{% set st_class = "primary" %}{% endif %}
+              {% if st == "In Progress" %}{% set st_class = "info" %}{% endif %}
+              {% if st == "Resolved" %}{% set st_class = "success" %}{% endif %}
+              {% if st == "Closed" %}{% set st_class = "dark" %}{% endif %}
+              <span class="badge text-bg-{{ st_class }} px-3 py-2">
+                {{ st }}
+              </span>
+            </td>
+
+            <td class="text-secondary">
+              {{ inc.updated_at.strftime("%Y-%m-%d %H:%M UTC") }}
+            </td>
+          </tr>
+        {% endfor %}
+
+        {% if incidents|length == 0 %}
+          <tr>
+            <td colspan="5" class="text-center py-5 text-secondary">
+              No incidents found.
+            </td>
+          </tr>
+        {% endif %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  {% if pagination %}
+  <div class="card-footer bg-white d-flex justify-content-between align-items-center">
+    <div class="text-secondary small">
+      Page {{ pagination.page }} of {{ pagination.pages if pagination.pages else 1 }}
+    </div>
+
+    <nav>
+      <ul class="pagination pagination-sm mb-0">
+        <li class="page-item {% if not pagination.has_prev %}disabled{% endif %}">
+          <a class="page-link"
+             href="{{ url_for('dashboard', page=pagination.prev_num, q=q, status=status, severity=severity) }}">
+            Prev
+          </a>
+        </li>
+        <li class="page-item {% if not pagination.has_next %}disabled{% endif %}">
+          <a class="page-link"
+             href="{{ url_for('dashboard', page=pagination.next_num, q=q, status=status, severity=severity) }}">
+            Next
+          </a>
+        </li>
+      </ul>
+    </nav>
+  </div>
+  {% endif %}
+</div>
+
+{% endblock %}
